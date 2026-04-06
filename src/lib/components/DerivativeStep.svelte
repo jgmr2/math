@@ -11,7 +11,7 @@
   let displayedDerivative = 0;
 
   onMount(() => {
-    const duration = 1500;
+    const duration = 800;
     const start = Date.now();
 
     const animate = () => {
@@ -30,177 +30,90 @@
   const sum = x + y + z;
 </script>
 
-<div class="step-card derivative-card">
+<div class="step-card">
   <div class="step-header">
-    <h3>Paso 3: Cálculo de la Derivada</h3>
-    <span class="step-number">📈</span>
+    <h3>Paso 3: Derivada</h3>
+    <span>📈</span>
   </div>
 
-  <div class="step-content">
-    <div class="description">
-      <p>
-        La derivada representa la tasa de cambio instantánea del vector. Muestra cómo cambia la función vectorial respecto
-        al tiempo.
-      </p>
-    </div>
+  <p class="description">
+    Tasa de cambio instantánea: (x + y + z) × |F| × cos(θ)
+  </p>
 
-    <div class="formula-container">
-      <p class="formula">d/dt = (x + y + z) × |F| × cos(θ)</p>
-    </div>
+  <div class="formula">
+    d/dt = {sum.toFixed(2)} × {magnitude.toFixed(2)} × {cosAngle.toFixed(4)}
+  </div>
 
-    <div class="calculation">
-      <p>d/dt = ({x} + {y} + {z}) × {magnitude.toFixed(2)} × {cosAngle.toFixed(4)}</p>
-      <p class="intermediate">d/dt = {sum.toFixed(2)} × {magnitude.toFixed(2)} × {cosAngle.toFixed(4)}</p>
-      <p class="intermediate">
-        d/dt = {(sum * magnitude).toFixed(2)} × {cosAngle.toFixed(4)}
-      </p>
-    </div>
-
-    <div class="result-box">
-      <p class="result-label">Tasa de Cambio (Derivada):</p>
-      <p class="result-value">{displayedDerivative.toFixed(2)} u</p>
-    </div>
-
-    <div class="interpretation">
-      <p>
-        <strong>Interpretación:</strong> La derivada de {derivative.toFixed(2)} u indica la velocidad con la que el vector
-        cambia en el espacio. Un valor positivo significa un cambio creciente en la magnitud del sistema.
-      </p>
-    </div>
+  <div class="result-box">
+    <div class="result-label">Derivada</div>
+    <div class="result-value">{displayedDerivative.toFixed(2)} u</div>
   </div>
 </div>
 
 <style>
   .step-card {
     background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    border-left: 5px solid #4caf50;
-    animation: slideIn 0.6s ease-out 0.4s both;
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    border-left: 3px solid #4caf50;
+    padding: 0.8rem;
   }
 
   .step-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   h3 {
     margin: 0;
-    color: #4caf50;
-    font-size: 1.3rem;
-  }
-
-  .step-number {
-    font-size: 1.8rem;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    font-weight: 600;
   }
 
   .description {
-    background: #e8f5e9;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    border-left: 3px solid #4caf50;
-  }
-
-  .description p {
-    margin: 0;
-    color: #555;
-    line-height: 1.6;
-  }
-
-  .formula-container {
-    text-align: center;
-    margin: 1.5rem 0;
-    padding: 1rem;
-    background: linear-gradient(135deg, #4caf5015 0%, #8bc34a15 100%);
-    border-radius: 8px;
+    margin: 0 0 0.6rem 0;
+    color: #666;
+    font-size: 0.8rem;
+    line-height: 1.3;
   }
 
   .formula {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #4caf50;
-  }
-
-  .calculation {
-    background: #fafafa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin: 1.5rem 0;
+    background: #e8f5e9;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 0.6rem 0;
     font-family: 'Courier New', monospace;
-    line-height: 1.8;
-  }
-
-  .calculation p {
-    margin: 0.5rem 0;
-    color: #333;
-  }
-
-  .intermediate {
-    color: #666;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
+    color: #4caf50;
+    font-weight: 600;
+    border: 1px solid #c8e6c9;
   }
 
   .result-box {
-    background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
-    color: white;
-    padding: 1.5rem;
-    border-radius: 8px;
+    background: #e8f5e9;
+    padding: 0.6rem;
+    border-radius: 4px;
+    border-left: 3px solid #4caf50;
     text-align: center;
-    margin: 1.5rem 0;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-    }
   }
 
   .result-label {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.2rem;
   }
 
   .result-value {
-    margin: 0;
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-weight: 700;
-  }
-
-  .interpretation {
-    background: #e0f2f1;
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 3px solid #009688;
-    margin-top: 1.5rem;
-  }
-
-  .interpretation p {
+    color: #4caf50;
+    font-family: 'Courier New', monospace;
     margin: 0;
-    color: #00695c;
-    line-height: 1.6;
   }
 </style>

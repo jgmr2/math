@@ -6,12 +6,10 @@
   export let z: number;
   export let magnitude: number;
 
-  let isAnimating = false;
   let displayedMagnitude = 0;
 
   onMount(() => {
-    isAnimating = true;
-    const duration = 1500;
+    const duration = 800;
     const start = Date.now();
 
     const animate = () => {
@@ -28,178 +26,90 @@
   });
 </script>
 
-<div class="step-card magnitude-card">
+<div class="step-card">
   <div class="step-header">
-    <h3>Paso 1: Magnitud del Vector</h3>
-    <span class="step-number">📐</span>
+    <h3>Paso 1: Magnitud</h3>
+    <span>📐</span>
   </div>
 
-  <div class="step-content">
-    <div class="description">
-      <p>
-        La magnitud es la longitud del vector en el espacio 3D. Se calcula usando la fórmula euclidiana.
-      </p>
-    </div>
+  <p class="description">
+    Longitud del vector: √(x² + y² + z²)
+  </p>
 
-    <div class="formula-container">
-      <p class="formula">|F| = √(x² + y² + z²)</p>
-    </div>
+  <div class="formula">
+    |F| = √({x}² + {y}² + {z}²)
+  </div>
 
-    <div class="calculation">
-      <p>|F| = √({x}² + {y}² + {z}²)</p>
-      <p class="intermediate">
-        |F| = √({(x * x).toFixed(2)} + {(y * y).toFixed(2)} + {(z * z).toFixed(2)})
-      </p>
-      <p class="intermediate">
-        |F| = √{(x * x + y * y + z * z).toFixed(2)}
-      </p>
-    </div>
-
-    <div class="result-box">
-      <p class="result-label">Resultado:</p>
-      <p class="result-value">{displayedMagnitude.toFixed(2)} u</p>
-    </div>
-
-    <div class="interpretation">
-      <p>
-        <strong>Interpretación:</strong> La magnitud de {magnitude.toFixed(2)} unidades representa la longitud total del
-        vector en el espacio tridimensional.
-      </p>
-    </div>
+  <div class="result-box">
+    <div class="result-label">Resultado</div>
+    <div class="result-value">{displayedMagnitude.toFixed(2)} u</div>
   </div>
 </div>
 
 <style>
   .step-card {
     background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    border-left: 5px solid #667eea;
-    animation: slideIn 0.6s ease-out;
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    border-left: 3px solid #2196f3;
+    padding: 0.8rem;
   }
 
   .step-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   h3 {
     margin: 0;
-    color: #667eea;
-    font-size: 1.3rem;
-  }
-
-  .step-number {
-    font-size: 1.8rem;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    font-weight: 600;
   }
 
   .description {
-    background: #f8f9ff;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    border-left: 3px solid #667eea;
-  }
-
-  .description p {
-    margin: 0;
-    color: #555;
-    line-height: 1.6;
-  }
-
-  .formula-container {
-    text-align: center;
-    margin: 1.5rem 0;
-    padding: 1rem;
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-    border-radius: 8px;
+    margin: 0 0 0.6rem 0;
+    color: #666;
+    font-size: 0.8rem;
+    line-height: 1.3;
   }
 
   .formula {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #667eea;
-  }
-
-  .calculation {
-    background: #fafafa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin: 1.5rem 0;
+    background: #f5f5f5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 0.6rem 0;
     font-family: 'Courier New', monospace;
-    line-height: 1.8;
-  }
-
-  .calculation p {
-    margin: 0.5rem 0;
-    color: #333;
-  }
-
-  .intermediate {
-    color: #666;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
+    color: #2196f3;
+    font-weight: 600;
+    border: 1px solid #e0e0e0;
   }
 
   .result-box {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 1.5rem;
-    border-radius: 8px;
+    background: #e3f2fd;
+    padding: 0.6rem;
+    border-radius: 4px;
+    border-left: 3px solid #2196f3;
     text-align: center;
-    margin: 1.5rem 0;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
-    }
   }
 
   .result-label {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.2rem;
   }
 
   .result-value {
-    margin: 0;
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-weight: 700;
-  }
-
-  .interpretation {
-    background: #e8f5e9;
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 3px solid #4caf50;
-    margin-top: 1.5rem;
-  }
-
-  .interpretation p {
+    color: #2196f3;
+    font-family: 'Courier New', monospace;
     margin: 0;
-    color: #2e7d32;
-    line-height: 1.6;
   }
 </style>
