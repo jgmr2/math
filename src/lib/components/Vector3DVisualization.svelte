@@ -112,6 +112,27 @@
 
       rotationGroup.add(axesGroup);
 
+      // Crear paralelepípedo (caja) para visualizar el espacio 3D
+      const boxSize = 300;
+      const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+      const edges = new THREE.EdgesGeometry(boxGeometry);
+      const boxMaterial = new THREE.LineBasicMaterial({ color: 0xcccccc, linewidth: 2 });
+      const wireframe = new THREE.LineSegments(edges, boxMaterial);
+      rotationGroup.add(wireframe);
+
+      // Agregar caras semitransparentes del paralelepípedo para mejor visualización
+      const faceGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+      const faceMaterials = [
+        new THREE.MeshStandardMaterial({ color: 0xff6b6b, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
+        new THREE.MeshStandardMaterial({ color: 0xff6b6b, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
+        new THREE.MeshStandardMaterial({ color: 0x51cf66, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
+        new THREE.MeshStandardMaterial({ color: 0x51cf66, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
+        new THREE.MeshStandardMaterial({ color: 0x4dabf7, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
+        new THREE.MeshStandardMaterial({ color: 0x4dabf7, opacity: 0.06, transparent: true, side: THREE.DoubleSide })
+      ];
+      const boxFaces = new THREE.Mesh(faceGeometry, faceMaterials);
+      rotationGroup.add(boxFaces);
+
       // Calcular magnitud y ángulo
       magnitude = Math.sqrt(x * x + y * y + z * z);
       const safeY = Math.max(Math.abs(y), 0.0001);
@@ -157,6 +178,47 @@
       const originMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
       const origin = new THREE.Mesh(originGeometry, originMaterial);
       vectorGroup.add(origin);
+
+      // Proyecciones del vector en los planos (líneas punteadas)
+      // Proyección en plano XY
+      const projXYGeometry = new THREE.BufferGeometry();
+      projXYGeometry.setAttribute('position', new THREE.BufferAttribute(
+        new Float32Array([0, 0, 0, vectorX, vectorY, 0]),
+        3
+      ));
+      const projMaterial = new THREE.LineBasicMaterial({ color: 0xff9999, linewidth: 1 });
+      const projXY = new THREE.Line(projXYGeometry, projMaterial);
+      vectorGroup.add(projXY);
+
+      // Proyección en plano XZ
+      const projXZGeometry = new THREE.BufferGeometry();
+      projXZGeometry.setAttribute('position', new THREE.BufferAttribute(
+        new Float32Array([0, 0, 0, vectorX, 0, vectorZ]),
+        3
+      ));
+      const projXZ = new THREE.Line(projXZGeometry, projMaterial);
+      vectorGroup.add(projXZ);
+
+      // Proyección en plano YZ
+      const projYZGeometry = new THREE.BufferGeometry();
+      projYZGeometry.setAttribute('position', new THREE.BufferAttribute(
+        new Float32Array([0, 0, 0, 0, vectorY, vectorZ]),
+        3
+      ));
+      const projYZ = new THREE.Line(projYZGeometry, projMaterial);
+      vectorGroup.add(projYZ);
+
+      // Líneas desde la punta del vector hasta las proyecciones para mostrar componentes
+      const linesMaterial = new THREE.LineBasicMaterial({ color: 0xdddddd, linewidth: 1 });
+
+      // Línea desde punta hasta proyección XY
+      const lineToXYGeometry = new THREE.BufferGeometry();
+      lineToXYGeometry.setAttribute('position', new THREE.BufferAttribute(
+        new Float32Array([vectorX, vectorY, vectorZ, vectorX, vectorY, 0]),
+        3
+      ));
+      const lineToXY = new THREE.Line(lineToXYGeometry, linesMaterial);
+      vectorGroup.add(lineToXY);
 
       rotationGroup.add(vectorGroup);
 
@@ -216,8 +278,9 @@
           const deltaX = e.touches[0].clientX - touchStartX;
           const deltaY = e.touches[0].clientY - touchStartY;
 
-          targetRotation.y += deltaX * 0.005;
-          targetRotation.x += deltaY * 0.005;
+          // Aumentar sensibilidad del toque (2x más que con ratón)
+          targetRotation.y += deltaX * 0.01;
+          targetRotation.x += deltaY * 0.01;
 
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
@@ -228,7 +291,8 @@
           const currentDistance = Math.sqrt(dx * dx + dy * dy);
           const distanceDelta = currentDistance - touchDistance;
           
-          targetZoom += (distanceDelta > 0 ? 0.1 : -0.1);
+          // Aumentar sensibilidad del zoom tactil
+          targetZoom += (distanceDelta > 0 ? 0.15 : -0.15);
           targetZoom = Math.max(0.3, Math.min(3, targetZoom));
           touchDistance = currentDistance;
         }
@@ -314,7 +378,7 @@
     </div>
   </div>
   <div class="help-text">
-    <strong>Controles:</strong> Arrastra para rotar • Rueda para zoom • Toque para mover • Pellizco para zoom
+    <strong>Controles:</strong> Arrastra para rotar • Rueda para zoom • Toque para rotar • Pellizco para zoom
   </div>
 </div>
 
