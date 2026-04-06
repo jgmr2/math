@@ -119,26 +119,72 @@
 
       rotationGroup.add(axesGroup);
 
-      // Crear paralelepípedo (caja) para visualizar el espacio 3D
-      const boxSize = 300;
-      const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-      const edges = new THREE.EdgesGeometry(boxGeometry);
-      const boxMaterial = new THREE.LineBasicMaterial({ color: 0xcccccc, linewidth: 2 });
-      const wireframe = new THREE.LineSegments(edges, boxMaterial);
-      rotationGroup.add(wireframe);
+      // Variables para el paralelepípedo y vector dinámicos
+      let dynamicBox: THREE.Group;
+      
+      // Función para crear/actualizar el paralelepípedo dinámico
+      function createDynamicBox(width: number, height: number, depth: number) {
+        if (dynamicBox) {
+          rotationGroup.remove(dynamicBox);
+        }
+        
+        dynamicBox = new THREE.Group();
+        
+        // Aristas del paralelepípedo
+        const boxEdges = [
+          // Aristas inferiores
+          [0, 0, 0, width, 0, 0],
+          [0, 0, 0, 0, height, 0],
+          [0, 0, 0, 0, 0, depth],
+          [width, 0, 0, width, height, 0],
+          [width, 0, 0, width, 0, depth],
+          [0, height, 0, width, height, 0],
+          [0, height, 0, 0, height, depth],
+          [0, 0, depth, width, 0, depth],
+          [0, 0, depth, 0, height, depth],
+          [width, height, 0, width, height, depth],
+          [width, 0, depth, width, height, depth],
+          [0, height, depth, width, height, depth]
+        ];
+        
+        const boxMaterial = new THREE.LineBasicMaterial({ color: 0x999999, linewidth: 2 });
+        
+        boxEdges.forEach(edge => {
+          const edgeGeometry = new THREE.BufferGeometry();
+          edgeGeometry.setAttribute('position', new THREE.BufferAttribute(
+            new Float32Array(edge),
+            3
+          ));
+          const line = new THREE.Line(edgeGeometry, boxMaterial);
+          dynamicBox.add(line);
+        });
+        
+        // Puntos en las 8 esquinas
+        const corners = [
+          [0, 0, 0],
+          [width, 0, 0],
+          [0, height, 0],
+          [0, 0, depth],
+          [width, height, 0],
+          [width, 0, depth],
+          [0, height, depth],
+          [width, height, depth]
+        ];
+        
+        const cornerGeometry = new THREE.SphereGeometry(6, 8, 8);
+        const cornerMaterial = new THREE.MeshStandardMaterial({ color: 0xff6b6b });
+        
+        corners.forEach(corner => {
+          const cornerMesh = new THREE.Mesh(cornerGeometry, cornerMaterial);
+          cornerMesh.position.set(...corner as [number, number, number]);
+          dynamicBox.add(cornerMesh);
+        });
+        
+        rotationGroup.add(dynamicBox);
+      }
 
-      // Agregar caras semitransparentes del paralelepípedo para mejor visualización
-      const faceGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-      const faceMaterials = [
-        new THREE.MeshStandardMaterial({ color: 0xff6b6b, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
-        new THREE.MeshStandardMaterial({ color: 0xff6b6b, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
-        new THREE.MeshStandardMaterial({ color: 0x51cf66, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
-        new THREE.MeshStandardMaterial({ color: 0x51cf66, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
-        new THREE.MeshStandardMaterial({ color: 0x4dabf7, opacity: 0.06, transparent: true, side: THREE.DoubleSide }),
-        new THREE.MeshStandardMaterial({ color: 0x4dabf7, opacity: 0.06, transparent: true, side: THREE.DoubleSide })
-      ];
-      const boxFaces = new THREE.Mesh(faceGeometry, faceMaterials);
-      rotationGroup.add(boxFaces);
+      // Crear paralelepípedo inicial
+      createDynamicBox(100, 100, 100);
 
       // Crear función para actualizar el vector
       function updateVector() {
@@ -152,33 +198,30 @@
         const safeY = Math.max(Math.abs(y), 0.0001);
         angle = Math.acos(safeY / Math.max(magnitude, 1)) * (180 / Math.PI);
 
-        // Normalizar vector para visualización
-        const scale = 150 / Math.max(magnitude, 1);
-        const vectorX = x * scale;
-        const vectorY = y * scale;
-        const vectorZ = z * scale;
+        // Crear paralelepípedo dinámico con las dimensiones del vector
+        createDynamicBox(x, y, z);
 
-        // Crear vector como flecha
+        // Crear vector como flecha que apunta a la esquina opuesta (x, y, z)
         vectorGroup = new THREE.Group();
         
-        // Línea del vector (más gruesa)
+        // Línea del vector desde origen hasta (x, y, z)
         const vectorGeometry = new THREE.BufferGeometry();
         vectorGeometry.setAttribute('position', new THREE.BufferAttribute(
-          new Float32Array([0, 0, 0, vectorX, vectorY, vectorZ]),
+          new Float32Array([0, 0, 0, x, y, z]),
           3
         ));
         const vectorMaterial = new THREE.LineBasicMaterial({ color: 0x2196f3, linewidth: 5 });
         const vectorLine = new THREE.Line(vectorGeometry, vectorMaterial);
         vectorGroup.add(vectorLine);
 
-        // Punta de flecha (cono mayor)
+        // Punta de flecha en el punto final (x, y, z)
         const arrowGeometry = new THREE.ConeGeometry(10, 30, 8);
         const arrowMaterial = new THREE.MeshStandardMaterial({ color: 0x2196f3, metalness: 0.5, roughness: 0.3 });
         const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-        arrow.position.set(vectorX, vectorY, vectorZ);
+        arrow.position.set(x, y, z);
         
         // Rotar flecha para que apunte en la dirección del vector
-        const direction = new THREE.Vector3(vectorX, vectorY, vectorZ).normalize();
+        const direction = new THREE.Vector3(x, y, z).normalize();
         const up = new THREE.Vector3(0, 1, 0);
         const rotAxis = new THREE.Vector3().crossVectors(up, direction).normalize();
         const rotAngle = Math.acos(Math.max(-1, Math.min(1, up.dot(direction))));
@@ -193,46 +236,12 @@
         const origin = new THREE.Mesh(originGeometry, originMaterial);
         vectorGroup.add(origin);
 
-        // Proyecciones del vector en los planos (líneas punteadas)
-        // Proyección en plano XY
-        const projXYGeometry = new THREE.BufferGeometry();
-        projXYGeometry.setAttribute('position', new THREE.BufferAttribute(
-          new Float32Array([0, 0, 0, vectorX, vectorY, 0]),
-          3
-        ));
-        const projMaterial = new THREE.LineBasicMaterial({ color: 0xff9999, linewidth: 1 });
-        const projXY = new THREE.Line(projXYGeometry, projMaterial);
-        vectorGroup.add(projXY);
-
-        // Proyección en plano XZ
-        const projXZGeometry = new THREE.BufferGeometry();
-        projXZGeometry.setAttribute('position', new THREE.BufferAttribute(
-          new Float32Array([0, 0, 0, vectorX, 0, vectorZ]),
-          3
-        ));
-        const projXZ = new THREE.Line(projXZGeometry, projMaterial);
-        vectorGroup.add(projXZ);
-
-        // Proyección en plano YZ
-        const projYZGeometry = new THREE.BufferGeometry();
-        projYZGeometry.setAttribute('position', new THREE.BufferAttribute(
-          new Float32Array([0, 0, 0, 0, vectorY, vectorZ]),
-          3
-        ));
-        const projYZ = new THREE.Line(projYZGeometry, projMaterial);
-        vectorGroup.add(projYZ);
-
-        // Líneas desde la punta del vector hasta las proyecciones para mostrar componentes
-        const linesMaterial = new THREE.LineBasicMaterial({ color: 0xdddddd, linewidth: 1 });
-
-        // Línea desde punta hasta proyección XY
-        const lineToXYGeometry = new THREE.BufferGeometry();
-        lineToXYGeometry.setAttribute('position', new THREE.BufferAttribute(
-          new Float32Array([vectorX, vectorY, vectorZ, vectorX, vectorY, 0]),
-          3
-        ));
-        const lineToXY = new THREE.Line(lineToXYGeometry, linesMaterial);
-        vectorGroup.add(lineToXY);
+        // Punto final del vector (esfera azul)
+        const endGeometry = new THREE.SphereGeometry(8, 16, 16);
+        const endMaterial = new THREE.MeshStandardMaterial({ color: 0x2196f3 });
+        const endPoint = new THREE.Mesh(endGeometry, endMaterial);
+        endPoint.position.set(x, y, z);
+        vectorGroup.add(endPoint);
 
         rotationGroup.add(vectorGroup);
       }
@@ -376,9 +385,11 @@
   });
 
   // Actualizar vector cuando x, y, z cambian
-  $: if (updateVector && typeof window !== 'undefined' && (x || y || z)) {
+  $: if (updateVector && typeof window !== 'undefined') {
+    const _ = x + y + z; // fuerza dependencia
     updateVector();
   }
+
 
 
 
