@@ -11,13 +11,13 @@
 
 <div class="vector-input">
   <label class="comp-label">X</label>
-  <input type="number" bind:value={x} step="0.1" onchange={handleUpdate} />
+  <input type="number" bind:value={x} step="0.1" on:input={handleUpdate} />
   
   <label class="comp-label">Y</label>
-  <input type="number" bind:value={y} step="0.01" onchange={handleUpdate} />
+  <input type="number" bind:value={y} step="0.01" on:input={handleUpdate} />
   
   <label class="comp-label">Z</label>
-  <input type="number" bind:value={z} step="0.1" onchange={handleUpdate} />
+  <input type="number" bind:value={z} step="0.1" on:input={handleUpdate} />
 </div>
 
 <style>

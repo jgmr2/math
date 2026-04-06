@@ -193,10 +193,58 @@
         targetZoom = Math.max(0.3, Math.min(3, targetZoom));
       };
 
+      // Touch controls para móviles/tablets
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchDistance = 0;
+
+      const onTouchStart = (e: TouchEvent) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+          // Touch zoom con dos dedos
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          touchDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+      };
+
+      const onTouchMove = (e: TouchEvent) => {
+        if (e.touches.length === 1 && isDragging) {
+          const deltaX = e.touches[0].clientX - touchStartX;
+          const deltaY = e.touches[0].clientY - touchStartY;
+
+          targetRotation.y += deltaX * 0.005;
+          targetRotation.x += deltaY * 0.005;
+
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+          // Zoom con dos dedos (pinch)
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const currentDistance = Math.sqrt(dx * dx + dy * dy);
+          const distanceDelta = currentDistance - touchDistance;
+          
+          targetZoom += (distanceDelta > 0 ? 0.1 : -0.1);
+          targetZoom = Math.max(0.3, Math.min(3, targetZoom));
+          touchDistance = currentDistance;
+        }
+      };
+
+      const onTouchEnd = () => {
+        isDragging = false;
+      };
+
       renderer.domElement.addEventListener('mousedown', onMouseDown);
       renderer.domElement.addEventListener('mousemove', onMouseMove);
       renderer.domElement.addEventListener('mouseup', onMouseUp);
       renderer.domElement.addEventListener('wheel', onMouseWheel, { passive: false });
+      renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: true });
+      renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
+      renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: true });
 
       // Loop de animación
       function animate() {
@@ -266,7 +314,7 @@
     </div>
   </div>
   <div class="help-text">
-    <strong>Controles:</strong> Arrastra para rotar • Rueda para zoom
+    <strong>Controles:</strong> Arrastra para rotar • Rueda para zoom • Toque para mover • Pellizco para zoom
   </div>
 </div>
 

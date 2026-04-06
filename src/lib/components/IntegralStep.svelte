@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
 
   export let magnitude: number;
   export let cosAngle: number;
@@ -7,7 +6,7 @@
 
   let displayedIntegral = 0;
 
-  onMount(() => {
+  $: if (integral !== undefined) {
     const duration = 800;
     const start = Date.now();
 
@@ -22,7 +21,7 @@
     };
 
     animate();
-  });
+  }
 
   const coefficient = -magnitude * cosAngle;
 </script>

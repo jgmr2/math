@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
 
   export let y: number;
   export let magnitude: number;
@@ -9,7 +8,7 @@
   let displayedAngle = 0;
   let displayedCosAngle = 0;
 
-  onMount(() => {
+  $: if (angle !== undefined && cosAngle !== undefined) {
     const duration = 800;
     const start = Date.now();
 
@@ -25,7 +24,7 @@
     };
 
     animate();
-  });
+  }
 </script>
 
 <div class="step-card">

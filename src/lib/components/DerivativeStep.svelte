@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
 
   export let x: number;
   export let y: number;
@@ -10,7 +9,7 @@
 
   let displayedDerivative = 0;
 
-  onMount(() => {
+  $: if (derivative !== undefined) {
     const duration = 800;
     const start = Date.now();
 
@@ -25,7 +24,7 @@
     };
 
     animate();
-  });
+  }
 
   const sum = x + y + z;
 </script>

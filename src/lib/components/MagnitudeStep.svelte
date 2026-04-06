@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
 
   export let x: number;
   export let y: number;
@@ -8,7 +7,7 @@
 
   let displayedMagnitude = 0;
 
-  onMount(() => {
+  $: if (magnitude !== undefined) {
     const duration = 800;
     const start = Date.now();
 
@@ -23,7 +22,7 @@
     };
 
     animate();
-  });
+  }
 </script>
 
 <div class="step-card">
