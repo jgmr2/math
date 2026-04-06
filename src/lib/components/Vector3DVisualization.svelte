@@ -21,7 +21,7 @@
   let rotationGroup: THREE.Group;
   let vectorGroup: THREE.Group;
   let animationId: number;
-  let updateVector: () => void;
+  let updateVector: (x: number, y: number, z: number) => void;
 
   onMount(() => {
     try {
@@ -187,41 +187,41 @@
       createDynamicBox(100, 100, 100);
 
       // Crear función para actualizar el vector
-      function updateVector() {
+      function updateVector(vectorX: number, vectorY: number, vectorZ: number) {
         // Remover vectorGroup anterior si existe
         if (vectorGroup) {
           rotationGroup.remove(vectorGroup);
         }
 
         // Calcular magnitud y ángulo
-        magnitude = Math.sqrt(x * x + y * y + z * z);
-        const safeY = Math.max(Math.abs(y), 0.0001);
+        magnitude = Math.sqrt(vectorX * vectorX + vectorY * vectorY + vectorZ * vectorZ);
+        const safeY = Math.max(Math.abs(vectorY), 0.0001);
         angle = Math.acos(safeY / Math.max(magnitude, 1)) * (180 / Math.PI);
 
         // Crear paralelepípedo dinámico con las dimensiones del vector
-        createDynamicBox(x, y, z);
+        createDynamicBox(vectorX, vectorY, vectorZ);
 
         // Crear vector como flecha que apunta a la esquina opuesta (x, y, z)
         vectorGroup = new THREE.Group();
         
         // Línea del vector desde origen hasta (x, y, z)
-        const vectorGeometry = new THREE.BufferGeometry();
-        vectorGeometry.setAttribute('position', new THREE.BufferAttribute(
-          new Float32Array([0, 0, 0, x, y, z]),
+        const lineGeometry = new THREE.BufferGeometry();
+        lineGeometry.setAttribute('position', new THREE.BufferAttribute(
+          new Float32Array([0, 0, 0, vectorX, vectorY, vectorZ]),
           3
         ));
         const vectorMaterial = new THREE.LineBasicMaterial({ color: 0x2196f3, linewidth: 5 });
-        const vectorLine = new THREE.Line(vectorGeometry, vectorMaterial);
+        const vectorLine = new THREE.Line(lineGeometry, vectorMaterial);
         vectorGroup.add(vectorLine);
 
         // Punta de flecha en el punto final (x, y, z)
         const arrowGeometry = new THREE.ConeGeometry(10, 30, 8);
         const arrowMaterial = new THREE.MeshStandardMaterial({ color: 0x2196f3, metalness: 0.5, roughness: 0.3 });
         const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-        arrow.position.set(x, y, z);
+        arrow.position.set(vectorX, vectorY, vectorZ);
         
         // Rotar flecha para que apunte en la dirección del vector
-        const direction = new THREE.Vector3(x, y, z).normalize();
+        const direction = new THREE.Vector3(vectorX, vectorY, vectorZ).normalize();
         const up = new THREE.Vector3(0, 1, 0);
         const rotAxis = new THREE.Vector3().crossVectors(up, direction).normalize();
         const rotAngle = Math.acos(Math.max(-1, Math.min(1, up.dot(direction))));
@@ -240,14 +240,14 @@
         const endGeometry = new THREE.SphereGeometry(8, 16, 16);
         const endMaterial = new THREE.MeshStandardMaterial({ color: 0x2196f3 });
         const endPoint = new THREE.Mesh(endGeometry, endMaterial);
-        endPoint.position.set(x, y, z);
+        endPoint.position.set(vectorX, vectorY, vectorZ);
         vectorGroup.add(endPoint);
 
         rotationGroup.add(vectorGroup);
       }
 
       // Actualizar el vector inicialmente
-      updateVector();
+      updateVector(x, y, z);
 
       // Event listeners para ratón
       const onMouseDown = (e: MouseEvent) => {
@@ -386,9 +386,9 @@
 
   // Actualizar vector cuando x, y, z cambian
   $: if (updateVector && typeof window !== 'undefined') {
-    const _ = x + y + z; // fuerza dependencia
-    updateVector();
+    updateVector(x, y, z);
   }
+
 
 
 
