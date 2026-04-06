@@ -8,7 +8,7 @@
   let displayedAngle = 0;
   let displayedCosAngle = 0;
 
-  $: if (angle !== undefined && cosAngle !== undefined) {
+  $: if (typeof window !== 'undefined' && angle !== undefined && cosAngle !== undefined) {
     const duration = 800;
     const start = Date.now();
 

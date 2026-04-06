@@ -10,14 +10,14 @@
 </script>
 
 <div class="vector-input">
-  <label class="comp-label">X</label>
-  <input type="number" bind:value={x} step="0.1" on:input={handleUpdate} />
+  <label class="comp-label" for="input-x">X</label>
+  <input id="input-x" type="number" bind:value={x} step="0.1" on:input={handleUpdate} />
   
-  <label class="comp-label">Y</label>
-  <input type="number" bind:value={y} step="0.01" on:input={handleUpdate} />
+  <label class="comp-label" for="input-y">Y</label>
+  <input id="input-y" type="number" bind:value={y} step="0.01" on:input={handleUpdate} />
   
-  <label class="comp-label">Z</label>
-  <input type="number" bind:value={z} step="0.1" on:input={handleUpdate} />
+  <label class="comp-label" for="input-z">Z</label>
+  <input id="input-z" type="number" bind:value={z} step="0.1" on:input={handleUpdate} />
 </div>
 
 <style>

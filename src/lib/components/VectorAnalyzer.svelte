@@ -144,10 +144,6 @@
     min-height: 0;
   }
 
-  .main-content.full-width {
-    grid-template-columns: 1fr;
-  }
-
   .graphic-panel {
     border-radius: 8px;
     overflow: hidden;

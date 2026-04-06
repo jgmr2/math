@@ -9,7 +9,7 @@
 
   let displayedDerivative = 0;
 
-  $: if (derivative !== undefined) {
+  $: if (typeof window !== 'undefined' && derivative !== undefined) {
     const duration = 800;
     const start = Date.now();
 

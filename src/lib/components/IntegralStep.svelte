@@ -6,7 +6,7 @@
 
   let displayedIntegral = 0;
 
-  $: if (integral !== undefined) {
+  $: if (typeof window !== 'undefined' && integral !== undefined) {
     const duration = 800;
     const start = Date.now();
 

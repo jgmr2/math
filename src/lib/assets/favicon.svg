@@ -1,0 +1,45 @@
+<svg viewBox="0 0 256 384" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo principal (cuerpo de la calculadora) -->
+  <rect width="256" height="384" rx="24" fill="#1a3a6b"/>
+  
+  <!-- Pantalla -->
+  <rect x="24" y="32" width="208" height="80" rx="16" fill="#1dd1a1" opacity="0.95"/>
+  
+  <!-- Botones primera fila (1, 2, 3) -->
+  <circle cx="60" cy="160" r="32" fill="#ffa500"/>
+  <circle cx="128" cy="160" r="32" fill="#ffa500"/>
+  <circle cx="196" cy="160" r="32" fill="#ffa500"/>
+  
+  <!-- Botones segunda fila (4, 5, 6) -->
+  <circle cx="60" cy="240" r="32" fill="#ffa500"/>
+  <circle cx="128" cy="240" r="32" fill="#ffa500"/>
+  <circle cx="196" cy="240" r="32" fill="#ffa500"/>
+  
+  <!-- Botones tercera fila (7, 8, 9) -->
+  <circle cx="60" cy="320" r="32" fill="#ffa500"/>
+  <circle cx="128" cy="320" r="32" fill="#ffa500"/>
+  <circle cx="196" cy="320" r="32" fill="#ffa500"/>
+  
+  <!-- Botones cuarta fila (*, 0) -->
+  <circle cx="60" cy="400" r="32" fill="#ffa500"/>
+  <circle cx="128" cy="400" r="32" fill="#ffa500"/>
+  
+  <!-- Botón grande derecha (más alto) -->
+  <rect x="164" y="340" width="64" height="120" rx="24" fill="#ffa500"/>
+  
+  <!-- Números en botones pequeños -->
+  <text x="60" y="168" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">1</text>
+  <text x="128" y="168" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">2</text>
+  <text x="196" y="168" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">3</text>
+  
+  <text x="60" y="248" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">4</text>
+  <text x="128" y="248" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">5</text>
+  <text x="196" y="248" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">6</text>
+  
+  <text x="60" y="328" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">7</text>
+  <text x="128" y="328" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">8</text>
+  <text x="196" y="328" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">9</text>
+  
+  <text x="60" y="408" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">*</text>
+  <text x="128" y="408" font-size="28" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">0</text>
+</svg>

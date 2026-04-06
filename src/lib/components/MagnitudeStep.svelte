@@ -7,7 +7,7 @@
 
   let displayedMagnitude = 0;
 
-  $: if (magnitude !== undefined) {
+  $: if (typeof window !== 'undefined' && magnitude !== undefined) {
     const duration = 800;
     const start = Date.now();
 
