@@ -15,6 +15,13 @@
   let targetZoom = 1;
   let magnitude = 0;
   let angle = 0;
+  
+  let scene: THREE.Scene;
+  let renderer: THREE.WebGLRenderer;
+  let rotationGroup: THREE.Group;
+  let vectorGroup: THREE.Group;
+  let animationId: number;
+  let updateVector: () => void;
 
   onMount(() => {
     try {
@@ -133,97 +140,105 @@
       const boxFaces = new THREE.Mesh(faceGeometry, faceMaterials);
       rotationGroup.add(boxFaces);
 
-      // Calcular magnitud y ángulo
-      magnitude = Math.sqrt(x * x + y * y + z * z);
-      const safeY = Math.max(Math.abs(y), 0.0001);
-      angle = Math.acos(safeY / Math.max(magnitude, 1)) * (180 / Math.PI);
+      // Crear función para actualizar el vector
+      function updateVector() {
+        // Remover vectorGroup anterior si existe
+        if (vectorGroup) {
+          rotationGroup.remove(vectorGroup);
+        }
 
-      // Normalizar vector para visualización
-      const scale = 150 / Math.max(magnitude, 1);
-      const vectorX = x * scale;
-      const vectorY = y * scale;
-      const vectorZ = z * scale;
+        // Calcular magnitud y ángulo
+        magnitude = Math.sqrt(x * x + y * y + z * z);
+        const safeY = Math.max(Math.abs(y), 0.0001);
+        angle = Math.acos(safeY / Math.max(magnitude, 1)) * (180 / Math.PI);
 
-      // Crear vector como flecha
-      const vectorGroup = new THREE.Group();
-      
-      // Línea del vector (más gruesa)
-      const vectorGeometry = new THREE.BufferGeometry();
-      vectorGeometry.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([0, 0, 0, vectorX, vectorY, vectorZ]),
-        3
-      ));
-      const vectorMaterial = new THREE.LineBasicMaterial({ color: 0x2196f3, linewidth: 5 });
-      const vectorLine = new THREE.Line(vectorGeometry, vectorMaterial);
-      vectorGroup.add(vectorLine);
+        // Normalizar vector para visualización
+        const scale = 150 / Math.max(magnitude, 1);
+        const vectorX = x * scale;
+        const vectorY = y * scale;
+        const vectorZ = z * scale;
 
-      // Punta de flecha (cono mayor)
-      const arrowGeometry = new THREE.ConeGeometry(10, 30, 8);
-      const arrowMaterial = new THREE.MeshStandardMaterial({ color: 0x2196f3, metalness: 0.5, roughness: 0.3 });
-      const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
-      arrow.position.set(vectorX, vectorY, vectorZ);
-      
-      // Rotar flecha para que apunte en la dirección del vector
-      const direction = new THREE.Vector3(vectorX, vectorY, vectorZ).normalize();
-      const up = new THREE.Vector3(0, 1, 0);
-      const rotAxis = new THREE.Vector3().crossVectors(up, direction).normalize();
-      const rotAngle = Math.acos(Math.max(-1, Math.min(1, up.dot(direction))));
-      if (rotAxis.length() > 0.001) {
-        arrow.setRotationFromAxisAngle(rotAxis, rotAngle);
+        // Crear vector como flecha
+        vectorGroup = new THREE.Group();
+        
+        // Línea del vector (más gruesa)
+        const vectorGeometry = new THREE.BufferGeometry();
+        vectorGeometry.setAttribute('position', new THREE.BufferAttribute(
+          new Float32Array([0, 0, 0, vectorX, vectorY, vectorZ]),
+          3
+        ));
+        const vectorMaterial = new THREE.LineBasicMaterial({ color: 0x2196f3, linewidth: 5 });
+        const vectorLine = new THREE.Line(vectorGeometry, vectorMaterial);
+        vectorGroup.add(vectorLine);
+
+        // Punta de flecha (cono mayor)
+        const arrowGeometry = new THREE.ConeGeometry(10, 30, 8);
+        const arrowMaterial = new THREE.MeshStandardMaterial({ color: 0x2196f3, metalness: 0.5, roughness: 0.3 });
+        const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+        arrow.position.set(vectorX, vectorY, vectorZ);
+        
+        // Rotar flecha para que apunte en la dirección del vector
+        const direction = new THREE.Vector3(vectorX, vectorY, vectorZ).normalize();
+        const up = new THREE.Vector3(0, 1, 0);
+        const rotAxis = new THREE.Vector3().crossVectors(up, direction).normalize();
+        const rotAngle = Math.acos(Math.max(-1, Math.min(1, up.dot(direction))));
+        if (rotAxis.length() > 0.001) {
+          arrow.setRotationFromAxisAngle(rotAxis, rotAngle);
+        }
+        vectorGroup.add(arrow);
+
+        // Punto en el origen (esfera negra)
+        const originGeometry = new THREE.SphereGeometry(8, 16, 16);
+        const originMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const origin = new THREE.Mesh(originGeometry, originMaterial);
+        vectorGroup.add(origin);
+
+        // Proyecciones del vector en los planos (líneas punteadas)
+        // Proyección en plano XY
+        const projXYGeometry = new THREE.BufferGeometry();
+        projXYGeometry.setAttribute('position', new THREE.BufferAttribute(
+          new Float32Array([0, 0, 0, vectorX, vectorY, 0]),
+          3
+        ));
+        const projMaterial = new THREE.LineBasicMaterial({ color: 0xff9999, linewidth: 1 });
+        const projXY = new THREE.Line(projXYGeometry, projMaterial);
+        vectorGroup.add(projXY);
+
+        // Proyección en plano XZ
+        const projXZGeometry = new THREE.BufferGeometry();
+        projXZGeometry.setAttribute('position', new THREE.BufferAttribute(
+          new Float32Array([0, 0, 0, vectorX, 0, vectorZ]),
+          3
+        ));
+        const projXZ = new THREE.Line(projXZGeometry, projMaterial);
+        vectorGroup.add(projXZ);
+
+        // Proyección en plano YZ
+        const projYZGeometry = new THREE.BufferGeometry();
+        projYZGeometry.setAttribute('position', new THREE.BufferAttribute(
+          new Float32Array([0, 0, 0, 0, vectorY, vectorZ]),
+          3
+        ));
+        const projYZ = new THREE.Line(projYZGeometry, projMaterial);
+        vectorGroup.add(projYZ);
+
+        // Líneas desde la punta del vector hasta las proyecciones para mostrar componentes
+        const linesMaterial = new THREE.LineBasicMaterial({ color: 0xdddddd, linewidth: 1 });
+
+        // Línea desde punta hasta proyección XY
+        const lineToXYGeometry = new THREE.BufferGeometry();
+        lineToXYGeometry.setAttribute('position', new THREE.BufferAttribute(
+          new Float32Array([vectorX, vectorY, vectorZ, vectorX, vectorY, 0]),
+          3
+        ));
+        const lineToXY = new THREE.Line(lineToXYGeometry, linesMaterial);
+        vectorGroup.add(lineToXY);
+
+        rotationGroup.add(vectorGroup);
       }
-      vectorGroup.add(arrow);
 
-      // Punto en el origen (esfera negra)
-      const originGeometry = new THREE.SphereGeometry(8, 16, 16);
-      const originMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
-      const origin = new THREE.Mesh(originGeometry, originMaterial);
-      vectorGroup.add(origin);
-
-      // Proyecciones del vector en los planos (líneas punteadas)
-      // Proyección en plano XY
-      const projXYGeometry = new THREE.BufferGeometry();
-      projXYGeometry.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([0, 0, 0, vectorX, vectorY, 0]),
-        3
-      ));
-      const projMaterial = new THREE.LineBasicMaterial({ color: 0xff9999, linewidth: 1 });
-      const projXY = new THREE.Line(projXYGeometry, projMaterial);
-      vectorGroup.add(projXY);
-
-      // Proyección en plano XZ
-      const projXZGeometry = new THREE.BufferGeometry();
-      projXZGeometry.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([0, 0, 0, vectorX, 0, vectorZ]),
-        3
-      ));
-      const projXZ = new THREE.Line(projXZGeometry, projMaterial);
-      vectorGroup.add(projXZ);
-
-      // Proyección en plano YZ
-      const projYZGeometry = new THREE.BufferGeometry();
-      projYZGeometry.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([0, 0, 0, 0, vectorY, vectorZ]),
-        3
-      ));
-      const projYZ = new THREE.Line(projYZGeometry, projMaterial);
-      vectorGroup.add(projYZ);
-
-      // Líneas desde la punta del vector hasta las proyecciones para mostrar componentes
-      const linesMaterial = new THREE.LineBasicMaterial({ color: 0xdddddd, linewidth: 1 });
-
-      // Línea desde punta hasta proyección XY
-      const lineToXYGeometry = new THREE.BufferGeometry();
-      lineToXYGeometry.setAttribute('position', new THREE.BufferAttribute(
-        new Float32Array([vectorX, vectorY, vectorZ, vectorX, vectorY, 0]),
-        3
-      ));
-      const lineToXY = new THREE.Line(lineToXYGeometry, linesMaterial);
-      vectorGroup.add(lineToXY);
-
-      rotationGroup.add(vectorGroup);
-
-      // Variables para controles
-      let animationId: number;
+      // Actualizar el vector inicialmente
+      updateVector();
 
       // Event listeners para ratón
       const onMouseDown = (e: MouseEvent) => {
@@ -359,6 +374,14 @@
       console.error('Error initializing Three.js:', error);
     }
   });
+
+  // Actualizar vector cuando x, y, z cambian
+  $: if (updateVector && typeof window !== 'undefined' && (x || y || z)) {
+    updateVector();
+  }
+
+
+
 </script>
 
 <div bind:this={container} class="visualization-container">
